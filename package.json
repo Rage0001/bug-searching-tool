@@ -1,0 +1,27 @@
+{
+  "name": "fehlerbot",
+  "version": "1.0.0",
+  "description": "A bot useful for Bug Hunters to search bugs from the Trello boards.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rage0001/bug-searching-tool.git"
+  },
+  "keywords": [
+    "bugs"
+  ],
+  "author": "Rage",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rage0001/bug-searching-tool/issues"
+  },
+  "homepage": "https://github.com/Rage0001/bug-searching-tool#readme",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "edit-json-file": "^1.2.1",
+    "request": "^2.88.0"
+  }
+}
