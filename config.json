@@ -9,7 +9,9 @@
         "ios_bugs": "57f2d333b99965a6ba8cd7e0",
         "store_bugs": "5bc7b4adf7d2b839fa6ac108",
         "android_bugs": "57f2a306ca14741151990900",
-        "linux_bugs": "5846f7fdfa2f44d1f47267b0"
+        "linux_bugs": "5846f7fdfa2f44d1f47267b0",
+        "overlay_bugs": "5cbfb347e17452475d790070",
+        "website_bugs": "5cc22e6be84de608c791fdb6"
     },
     "emotes": {
         "p0": "569576288092684318",
