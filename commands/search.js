@@ -1,7 +1,7 @@
 const config = require("../config.json");
 const request = require("request");
 const Discord = require("discord.js");
-const boards = ["desktop", "ios", "linux", "android", "store"]
+const boards = ["desktop", "ios", "linux", "android", "store", "web", "overlay"]
 
 module.exports.run = async (client, message, args) => {
     const labelSeverity = ["red", "orange", "yellow", "green"]
@@ -29,6 +29,12 @@ module.exports.run = async (client, message, args) => {
         break;
         case "store":
             boardID = config.trello.store_bugs
+        break;
+        case "web":
+            boardID = config.trello.website_bugs
+        break;
+        case "overlay":
+            boardID = config.trello.overlay_bugs
         break;
         default:
             boardID = config.trello.desktop_bugs
