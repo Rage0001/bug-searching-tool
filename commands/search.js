@@ -14,7 +14,7 @@ module.exports.run = async (client, message, args) => {
         return message.channel.send("Not a valid board.")
     }
     var boardID
-    switch(board){
+    switch(board.toLowerCase()){
         case "desktop":
             boardID = config.trello.desktop_bugs
         break;
