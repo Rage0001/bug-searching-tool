@@ -1,7 +1,5 @@
 # bug-searching-tool
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
-
 A bot useful for Bug Hunters to search bugs from the Trello boards.
 
   - Speedy search
