@@ -116,11 +116,11 @@ module.exports.run = async (client, message, args) => {
                 await resultsEmbed.setImage(cards[0].attachments[0].url)
             }
             if (cards[0].name.length > 250) {
-				await resultsEmbed.setTitle(cards[0].name.substring(0, 247) + "...")
-			}
-			else {
-				await resultsEmbed.setTitle(cards[0].name)
-			}
+		await resultsEmbed.setTitle(cards[0].name.substring(0, 247) + "...")
+	    }
+	    else {
+		await resultsEmbed.setTitle(cards[0].name)
+	    }
             await resultsEmbed.setDescription(`Labels: ${finalLabels}\nList: ${JSON.parse(bodytwo).name}\nArchived: ${cards[0].closed}\n\n${final}\n\nLink: ${cards[0].shortUrl}`)
             await resultsEmbed.setColor("#ff3535")
             await resultsEmbed.setFooter(`Executed by ${message.author.tag}`, message.author.avatarURL)
