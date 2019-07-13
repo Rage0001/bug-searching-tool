@@ -80,7 +80,7 @@ module.exports.run = async (client, message, args) => {
   let botMsg = null
 
   const renderSearch = async (cards) => {
-    if (cards.length > 1) {
+    if (cards.length > 1 || currentPage !== 0) {
       var cardsDone = []
       cards.forEach(card => {
         cardsDone.push(`**${card.name}**\nLink: ${card.shortUrl}`)
