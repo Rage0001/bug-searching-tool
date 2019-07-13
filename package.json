@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Rage0001/bug-searching-tool#readme",
   "dependencies": {
     "discord.js": "^11.4.2",
+    "dotenv": "^8.0.0",
     "edit-json-file": "^1.2.1",
     "request": "^2.88.0"
   }

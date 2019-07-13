@@ -48,7 +48,7 @@ module.exports.run = async (client, message, args) => {
          modelTypes: 'cards',
          boards_limit: '1',
          card_fields: 'desc,name,shortUrl,labels,closed',
-         cards_limit: '5',
+         cards_limit: '25',
          cards_page: '0',
          card_list: 'false',
          card_members: 'false',
@@ -59,8 +59,8 @@ module.exports.run = async (client, message, args) => {
          member_fields: 'avatarHash,fullName,initials,username,confirmed',
          members_limit: '10',
          partial: 'false',
-         key: config.trello.key,
-         token: config.trello.token } };
+         key: process.env.TRELLO_KEY,
+         token: process.env.TRELLO_TOKEN } };
     
     request(options, async function (error, response, body) {
       if (error) throw new Error(error);
@@ -72,12 +72,66 @@ module.exports.run = async (client, message, args) => {
             cards.forEach(card => {
                 cardsDone.push(`**${card.name}**\nLink: ${card.shortUrl}`)
             })
-            var cardsJoin = cardsDone.join("\n\n")
-            await resultsEmbed.setTitle(`Found ${cards.length} results:`)
-            await resultsEmbed.setDescription(cardsJoin)
-            await resultsEmbed.setColor("#ff3535")
-            await resultsEmbed.setFooter(`Executed by ${message.author.tag}`, message.author.avatarURL)
-            await message.channel.send(resultsEmbed)
+            if(cards.length <= 5){
+                var cardsJoin = cardsDone.join("\n\n")
+                await resultsEmbed.setTitle(`Found ${cards.length} results:`)
+                await resultsEmbed.setDescription(cardsJoin)
+                await resultsEmbed.setColor("#ff3535")
+                await resultsEmbed.setFooter(`Executed by ${message.author.tag}`, message.author.avatarURL)
+                await message.channel.send(resultsEmbed)
+            } else {
+                var chunks = cardsDone.chunk(5)
+                let forwardEmoji = '▶'
+                let backwardEmoji = '◀'
+                resultsEmbed.setTitle(`Found ${cards.length} results: (Page 1 of ${chunks.length})`)
+                resultsEmbed.setDescription(chunks[0].join('\n\n'))
+                resultsEmbed.setColor("#ff3535")
+                resultsEmbed.setFooter(`Executed by ${message.author.tag} | Results are limited to 25 cards per query.`, message.author.avatarURL)
+                var msg = await message.channel.send(resultsEmbed)
+                var backwardReaction = await msg.react(backwardEmoji)
+                var forwardReaction = await msg.react(forwardEmoji)
+                const filter = (reaction, user) => user.id === message.author.id
+                const collector = msg.createReactionCollector(filter, { time: 60000 })
+                var page = 0
+                collector.on('collect', r => {
+                    switch(r.emoji.name){
+                        case forwardEmoji:
+                            var ForwardUserReaction = r.message.reactions.filter(r => r._emoji.name === forwardEmoji)
+                            ForwardUserReaction.first().remove(message.author)
+                            page = page + 1
+                            if(page === chunks.length){
+                                resultsEmbed.setTitle(`Found ${cards.length} results: (Page 1 of ${chunks.length})`)
+                                resultsEmbed.setDescription(chunks[0].join('\n\n'))
+                                page = 0
+                                return msg.edit(resultsEmbed)
+                            }
+                            resultsEmbed.setTitle(`Found ${cards.length} results: (Page ${page + 1} of ${chunks.length})`)
+                            resultsEmbed.setDescription(chunks[page].join('\n\n'))
+                            msg.edit(resultsEmbed)
+                        break;
+                        case backwardEmoji:
+                            var BackwardUserReaction = r.message.reactions.filter(r => r._emoji.name === backwardEmoji)
+                            BackwardUserReaction.first().remove(message.author)
+                            page = page - 1
+                            if(page === -1){
+                                resultsEmbed.setTitle(`Found ${cards.length} results: (Page ${chunks.length} of ${chunks.length})`)
+                                resultsEmbed.setDescription(chunks[chunks.length - 1].join('\n\n'))
+                                page = chunks.length - 1
+                                return msg.edit(resultsEmbed)
+                            }
+                            resultsEmbed.setTitle(`Found ${cards.length} results: (Page ${page + 1} of ${chunks.length})`)
+                            resultsEmbed.setDescription(chunks[page].join('\n\n'))
+                            msg.edit(resultsEmbed)
+                        break;
+                        default:
+                        break;
+                    }
+                })
+                collector.on('end', c => {
+                    backwardReaction.remove(client.user)
+                    forwardReaction.remove(client.user)
+                })
+            }
             client.queries++
         } else {
             if(cards.length === 0){
@@ -87,8 +141,8 @@ module.exports.run = async (client, message, args) => {
             url: `https://api.trello.com/1/cards/${cards[0].id}/list`,
             qs: 
             { fields: 'all',
-              key: config.trello.key,
-              token: config.trello.token } };
+              key: process.env.TRELLO_KEY,
+              token: process.env.TRELLO_TOKEN } };
               request(optionstwo, async function (error, response, bodytwo) {
             let one = cards[0].desc.replace(/####Steps to reproduce:/g, "➤ __**Steps to reproduce:**__")
             let two = one.replace(/####Expected result:/g, "➤ __**Expected result:**__")
@@ -134,3 +188,12 @@ module.exports.run = async (client, message, args) => {
 module.exports.help = {
     name: "search"
 }
+
+Object.defineProperty(Array.prototype, 'chunk', {
+    value: function(chunkSize) {
+      var R = [];
+      for (var i = 0; i < this.length; i += chunkSize)
+        R.push(this.slice(i, i + chunkSize));
+      return R;
+    }
+  });
