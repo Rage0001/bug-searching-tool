@@ -48,7 +48,7 @@ module.exports.run = async (client, message, args) => {
          modelTypes: 'cards',
          boards_limit: '1',
          card_fields: 'desc,name,shortUrl,labels,closed',
-         cards_limit: '25',
+         cards_limit: '1000',
          cards_page: '0',
          card_list: 'false',
          card_members: 'false',
@@ -86,7 +86,7 @@ module.exports.run = async (client, message, args) => {
                 resultsEmbed.setTitle(`Found ${cards.length} results: (Page 1 of ${chunks.length})`)
                 resultsEmbed.setDescription(chunks[0].join('\n\n'))
                 resultsEmbed.setColor("#ff3535")
-                resultsEmbed.setFooter(`Executed by ${message.author.tag} | Results are limited to 25 cards per query.`, message.author.avatarURL)
+                resultsEmbed.setFooter(`Executed by ${message.author.tag}`, message.author.avatarURL)
                 var msg = await message.channel.send(resultsEmbed)
                 var backwardReaction = await msg.react(backwardEmoji)
                 var forwardReaction = await msg.react(forwardEmoji)
