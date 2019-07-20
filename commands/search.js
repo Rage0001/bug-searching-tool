@@ -42,12 +42,19 @@ module.exports.run = async (client, message, args) => {
         var backwardReaction = await botMsg.react(backwardEmoji)
         var forwardReaction = await botMsg.react(forwardEmoji)
         const filter = (reaction, user) => user.id === message.author.id
-        const collector = botMsg.createReactionCollector(filter, {
-          time: 60000
-        })
+        const collector = botMsg.createReactionCollector(filter)
+        let stopTimer
+        const setStopTimer = () => {
+          if (stopTimer !== undefined) {
+            clearTimeout(stopTimer)
+          }
+          stopTimer = setTimeout(() => collector.stop(), 60000)
+        }
+        setStopTimer()
         collector.on('collect', async (r) => {
           switch (r.emoji.name) {
             case forwardEmoji:
+              setStopTimer()
               var ForwardUserReaction = r.message.reactions.filter(r => r._emoji.name === forwardEmoji)
               ForwardUserReaction.first().remove(message.author)
               currentPage++
@@ -59,6 +66,7 @@ module.exports.run = async (client, message, args) => {
               renderSearch(searchResults)
               break;
             case backwardEmoji:
+              setStopTimer()
               var BackwardUserReaction = r.message.reactions.filter(r => r._emoji.name === backwardEmoji)
               BackwardUserReaction.first().remove(message.author)
               if (currentPage === 0) {
