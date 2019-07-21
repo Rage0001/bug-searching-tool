@@ -7,6 +7,10 @@
     <a href="https://prettier.io/">
     <img alt="Codestyle: Prettier" src="https://img.shields.io/badge/codestyle-prettier-ff69b4.svg">
   </a>
+    </a>
+    <a href="https://travis-ci.com/Rage0001/bug-searching-tool">
+    <img alt="Build Status" src="https://travis-ci.com/Rage0001/bug-searching-tool.svg?branch=master">
+  </a>
 </p>
 
 A bot useful for Bug Hunters to search bugs from the Trello boards.
