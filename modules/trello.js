@@ -47,6 +47,41 @@ module.exports.getListName = async cardID => {
   return result.name
 }
 
+module.exports.getTicket = async cardID => {
+  let options = {
+    method: 'GET',
+    url: `https://api.trello.com/1/cards/${cardID}`,
+    qs: {
+      fields: 'desc,name,shortUrl,labels,closed',
+      attachments: 'true',
+      attachment_fields: 'all',
+      members: 'false',
+      membersVoted: 'false',
+      checkItemStates: 'false',
+      checklists: 'none',
+      checklist_fields: 'all',
+      board: 'true',
+      board_fields: 'name,url',
+      list: 'true',
+      pluginData: 'false',
+      stickers: 'false',
+      sticker_fields: 'all',
+      customFieldItems: 'false',
+      key: process.env.TRELLO_KEY,
+      token: process.env.TRELLO_TOKEN
+    }
+  }
+
+  const body = (await requestPromise(options)).body
+  let result
+  try {
+    result = JSON.parse(body)
+  } catch (e) {
+    result = false
+  }
+  return result
+}
+
 module.exports.formatDescription = async desc => {
   let formatted = desc
     .replace(/####Steps to reproduce:/g, '➤ __**Steps to reproduce:**__')
