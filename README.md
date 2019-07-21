@@ -1,5 +1,14 @@
 # bug-searching-tool
 
+<p>
+  <a href="./LICENSE">
+    <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg">
+  </a>
+    <a href="https://prettier.io/">
+    <img alt="Codestyle: Prettier" src="https://img.shields.io/badge/codestyle-prettier-ff69b4.svg">
+  </a>
+</p>
+
 A bot useful for Bug Hunters to search bugs from the Trello boards.
 
 - Speedy search

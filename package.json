@@ -4,7 +4,8 @@
   "description": "A bot useful for Bug Hunters to search bugs from the Trello boards.",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "test": "prettier --config ./.prettierrc --write ."
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,7 @@
   },
   "devDependencies": {
     "husky": "^3.0.1",
-    "prettier": "1.18.2",
+    "prettier": "^1.18.2",
     "pretty-quick": "^1.11.1"
   }
 }
