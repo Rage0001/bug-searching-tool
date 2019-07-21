@@ -1,4 +1,4 @@
-const request = require("request")
+const request = require('request')
 const { promisify } = require('util')
 
 const requestPromise = promisify(request)
@@ -27,12 +27,12 @@ module.exports.trelloSearch = async (input, boardID, page) => {
       key: process.env.TRELLO_KEY,
       token: process.env.TRELLO_TOKEN
     }
-  };
+  }
   const result = JSON.parse((await requestPromise(options)).body)
   return result.cards
 }
 
-module.exports.getListName = async (cardID) => {
+module.exports.getListName = async cardID => {
   let options = {
     method: 'GET',
     url: `https://api.trello.com/1/cards/${cardID}/list`,
@@ -41,17 +41,18 @@ module.exports.getListName = async (cardID) => {
       key: process.env.TRELLO_KEY,
       token: process.env.TRELLO_TOKEN
     }
-  };
+  }
 
   const result = JSON.parse((await requestPromise(options)).body)
   return result.name
 }
 
-module.exports.formatDescription = async (desc) => {
-  let formatted = desc.replace(/####Steps to reproduce:/g, "➤ __**Steps to reproduce:**__")
-  .replace(/####Expected result:/g, "➤ __**Expected result:**__")
-  .replace(/####Actual result:/g, "➤ __**Actual result:**__")
-  .replace(/####Client settings:/g, "➤ __**Client settings:**__")
-  .replace(/####System settings:/g, "➤ __**System settings:**__")
-  return formatted;
+module.exports.formatDescription = async desc => {
+  let formatted = desc
+    .replace(/####Steps to reproduce:/g, '➤ __**Steps to reproduce:**__')
+    .replace(/####Expected result:/g, '➤ __**Expected result:**__')
+    .replace(/####Actual result:/g, '➤ __**Actual result:**__')
+    .replace(/####Client settings:/g, '➤ __**Client settings:**__')
+    .replace(/####System settings:/g, '➤ __**System settings:**__')
+  return formatted
 }
