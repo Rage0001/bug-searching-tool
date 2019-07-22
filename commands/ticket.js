@@ -30,7 +30,6 @@ module.exports.run = async (client, message, args) => {
       return message.channel.send('No results returned.')
     }
 
-    // let listName = await trello.getListName(card.id)
     let listName = card.list.name
     let formattedDesc = await trello.formatDescription(card.desc)
     var labels = []
@@ -91,7 +90,6 @@ module.exports.run = async (client, message, args) => {
       message.author.avatarURL
     )
     message.channel.send(resultsEmbed)
-    client.queries++
   }
 
   renderCard(await trello.getTicket(trelloCardId[1]))

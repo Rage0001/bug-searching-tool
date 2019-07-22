@@ -104,7 +104,6 @@ module.exports.run = async (client, message, args) => {
           backwardReaction.remove(client.user)
           forwardReaction.remove(client.user)
         })
-        client.queries++
       } else {
         botMsg.edit(resultsEmbed)
       }
@@ -169,7 +168,6 @@ module.exports.run = async (client, message, args) => {
         message.author.avatarURL
       )
       message.channel.send(resultsEmbed)
-      client.queries++
     }
   }
   renderSearch(await trello.trelloSearch(input, boardID, 0))
