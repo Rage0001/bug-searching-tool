@@ -13,7 +13,7 @@ module.exports.trelloSearch = async (input, boardID, page) => {
       modelTypes: 'cards',
       boards_limit: '1',
       card_fields: 'desc,name,shortUrl,labels,closed',
-      cards_limit: '5',
+      cards_limit: '6',
       cards_page: String(page),
       card_list: 'false',
       card_members: 'false',
@@ -122,7 +122,10 @@ module.exports.getReproRatio = async comments => {
       cnrs = cnrs + 1
     }
   })
-  return { crs, cnrs }
+  return {
+    crs,
+    cnrs
+  }
 }
 
 module.exports.filterComments = async comments => {
@@ -137,7 +140,10 @@ module.exports.filterComments = async comments => {
       )
     }
   })
-  return { userComments, adminComments }
+  return {
+    userComments,
+    adminComments
+  }
 }
 
 module.exports.formatDescription = async desc => {

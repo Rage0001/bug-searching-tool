@@ -33,10 +33,15 @@ module.exports.run = async (client, message, args) => {
 
   let botMsg = null
 
+  let hasForwardReaction = false
+
   const renderSearch = async cards => {
     if (cards.length > 1 || currentPage !== 0) {
       var cardsDone = []
-      cards.forEach(card => {
+      cards.forEach((card, idx) => {
+        if (idx >= 5) {
+          return
+        }
         cardsDone.push(`**${card.name}**\nLink: ${card.shortUrl}`)
       })
       let forwardEmoji = '▶'
@@ -50,8 +55,11 @@ module.exports.run = async (client, message, args) => {
       )
       if (botMsg == null) {
         botMsg = await message.channel.send(resultsEmbed)
-        var backwardReaction = await botMsg.react(backwardEmoji)
-        var forwardReaction = await botMsg.react(forwardEmoji)
+        if (cards.length > 5) {
+          await botMsg.react(backwardEmoji)
+          botMsg.react(forwardEmoji)
+          hasForwardReaction = true
+        }
         const filter = (reaction, user) => user.id === message.author.id
         const collector = botMsg.createReactionCollector(filter)
         let stopTimer
@@ -101,11 +109,25 @@ module.exports.run = async (client, message, args) => {
           }
         })
         collector.on('end', c => {
-          backwardReaction.remove(client.user)
-          forwardReaction.remove(client.user)
+          try {
+            botMsg.reactions.get(backwardEmoji).remove(client.user)
+          } catch (e) {}
+          try {
+            botMsg.reactions.get(forwardEmoji).remove(client.user)
+          } catch (e) {}
         })
       } else {
         botMsg.edit(resultsEmbed)
+      }
+      if (!hasForwardReaction && cards.length > 5) {
+        botMsg.react(forwardEmoji)
+        hasForwardReaction = true
+      }
+      if (hasForwardReaction && cards.length <= 5) {
+        try {
+          botMsg.reactions.get(forwardEmoji).remove(client.user)
+        } catch (e) {}
+        hasForwardReaction = false
       }
     } else {
       if (cards.length === 0) {
