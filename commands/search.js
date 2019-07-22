@@ -1,6 +1,5 @@
 const config = require('../config.json')
 const trello = require('../modules/trello.js')
-const request = require('request')
 const Discord = require('discord.js')
 const boards = ['desktop', 'ios', 'linux', 'android', 'store', 'web', 'overlay']
 
