@@ -10,7 +10,6 @@ const config = editor('./config.json', {
 
 client.commands = new Discord.Collection()
 client.config = config
-client.queries = 0
 
 fs.readdir('./commands/', (err, files) => {
   if (err) return console.error(err)

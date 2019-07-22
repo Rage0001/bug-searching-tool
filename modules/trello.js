@@ -82,6 +82,64 @@ module.exports.getTicket = async cardID => {
   return result
 }
 
+module.exports.getComments = async cardID => {
+  var boardIDs = [
+    '5771673855f47b547f2decc3',
+    '57f2d333b99965a6ba8cd7e0',
+    '5bc7b4adf7d2b839fa6ac108',
+    '57f2a306ca14741151990900',
+    '5846f7fdfa2f44d1f47267b0',
+    '5cbfb347e17452475d790070',
+    '5cc22e6be84de608c791fdb6'
+  ]
+
+  var options = {
+    method: 'GET',
+    url: `https://api.trello.com/1/cards/${cardID}/actions?filter=commentCard&alimit=1`,
+    qs: {
+      key: process.env.TRELLO_KEY,
+      token: process.env.TRELLO_TOKEN
+    }
+  }
+
+  const result = JSON.parse((await requestPromise(options)).body)
+
+  if (!boardIDs.includes(result[0].data.board.id)) {
+    result = null
+  }
+
+  return result
+}
+
+module.exports.getReproRatio = async comments => {
+  var crs = 0
+  var cnrs = 0
+  comments.forEach(comment => {
+    if (comment.memberCreator.id !== '58c07cf2115d7e5848862195') return
+    if (comment.data.text.includes('Can reproduce.')) {
+      crs = crs + 1
+    } else if (comment.data.text.includes(`Can't reproduce.`)) {
+      cnrs = cnrs + 1
+    }
+  })
+  return { crs, cnrs }
+}
+
+module.exports.filterComments = async comments => {
+  let userComments = []
+  let adminComments = []
+  comments.forEach(comment => {
+    if (comment.memberCreator.id === '58c07cf2115d7e5848862195') {
+      userComments.push(comment.data.text)
+    } else {
+      adminComments.push(
+        `${comment.data.text} - ${comment.memberCreator.fullName}`
+      )
+    }
+  })
+  return { userComments, adminComments }
+}
+
 module.exports.formatDescription = async desc => {
   let formatted = desc
     .replace(/####Steps to reproduce:/g, '➤ __**Steps to reproduce:**__')

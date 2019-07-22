@@ -1,6 +1,5 @@
 const config = require('../config.json')
 const trello = require('../modules/trello.js')
-const request = require('request')
 const Discord = require('discord.js')
 const boards = ['desktop', 'ios', 'linux', 'android', 'store', 'web', 'overlay']
 
@@ -105,7 +104,6 @@ module.exports.run = async (client, message, args) => {
           backwardReaction.remove(client.user)
           forwardReaction.remove(client.user)
         })
-        client.queries++
       } else {
         botMsg.edit(resultsEmbed)
       }
@@ -170,7 +168,6 @@ module.exports.run = async (client, message, args) => {
         message.author.avatarURL
       )
       message.channel.send(resultsEmbed)
-      client.queries++
     }
   }
   renderSearch(await trello.trelloSearch(input, boardID, 0))
