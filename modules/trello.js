@@ -102,7 +102,7 @@ module.exports.getComments = async cardID => {
     }
   }
 
-  const result = JSON.parse((await requestPromise(options)).body)
+  var result = JSON.parse((await requestPromise(options)).body)
 
   if (!boardIDs.includes(result[0].data.board.id)) {
     result = null
