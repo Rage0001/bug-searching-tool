@@ -8,7 +8,7 @@ module.exports.run = async (client, message, args) => {
     let target =
       message.mentions.members.first() ||
       message.guild.members.get(args[0]) ||
-      message.guild.members.find(target => target.displayName.toLowerCase() === args[0].toLowerCase()) || // finds by a display name
+      message.guild.members.find(target => target.displayName.toLowerCase() === args[0].toLowerCase()) ||
       message.guild.members.filter(target => target.user.username.toLowerCase() === args[0].toLowerCase()).first()
 
     if (!target) return message.channel.send('I can\'t find such server member :<')
