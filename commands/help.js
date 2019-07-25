@@ -1,29 +1,33 @@
 const Discord = require('discord.js')
 
 module.exports.run = async (client, message, args) => {
-  var formattedData = []
-  client.commands.forEach(cmd => {
-    formattedData.push(`?${cmd.help.name} - \`${cmd.help.help.desc}\``)
-  })
+  var prefix = client.config.get('prefix')
   if (args[0]) {
     let command = client.commands.get(args[0]) || client.aliases.get(args[0])
     if (!command) return message.channel.send("I couldn't find that command.")
     let cmdEmbed = new Discord.RichEmbed()
       .setAuthor(command.help.name)
-      .addField('Usage', command.help.help.usage, true)
+      .addField('Usage', prefix + command.help.help.usage, true)
       .addField('Description', command.help.help.desc, true)
       .setColor('#ff30a9')
       .setTimestamp()
-      .setFooter(`Run ?help to see a list of all commands.`)
+      .setFooter(`Run ${prefix}help to see a list of all commands.`)
     return message.channel.send(cmdEmbed)
   }
+
+  var formattedData = []
+  client.commands.forEach(cmd => {
+    formattedData.push(`${prefix}${cmd.help.name} - \`${cmd.help.help.desc}\``)
+  })
   let helpEmbed = new Discord.RichEmbed()
     .setDescription(formattedData.join('\n'))
     .setAuthor('Fehlerbot Help Menu™')
     .setColor('#ff30a9')
     .setThumbnail(client.user.avatarURL)
     .setTimestamp()
-    .setFooter(`Run ?help [command] to see more details about a command.`)
+    .setFooter(
+      `Run ${prefix}help [command] to see more details about a command.`
+    )
   message.channel.send(helpEmbed)
 }
 
@@ -31,6 +35,7 @@ module.exports.help = {
   name: 'help',
   help: {
     desc: 'Displays the help menu.',
-    usage: '?help'
-  }
+    usage: 'help'
+  },
+  aliases: ['h']
 }

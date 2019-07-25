@@ -10,6 +10,8 @@ module.exports = async (client, msg) => {
     .split(/ +/g)
   const command = args.shift().toLowerCase()
 
-  let commandfile = client.commands.get(command)
-  if (commandfile) commandfile.run(client, msg, args)
+  const cmd =
+    client.commands.get(command) ||
+    client.commands.get(client.aliases.get(command))
+  if (cmd) cmd.run(client, msg, args)
 }

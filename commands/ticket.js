@@ -49,7 +49,6 @@ module.exports.run = async (client, message, args) => {
     }
     let finalLabels = labels.join(' ')
     if (finalLabels === '') finalLabels = 'None'
-    message.channel.send("Here you go, here's what I found:")
     if (card.attachments.length !== 0) {
       var youtubeURL = card.attachments[0].url.match(
         '^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$'
@@ -89,7 +88,9 @@ module.exports.run = async (client, message, args) => {
       `Executed by ${message.author.tag}`,
       message.author.avatarURL
     )
-    message.channel.send(resultsEmbed)
+    message.channel.send("Here you go, here's what I found:", {
+      embed: resultsEmbed
+    })
   }
 
   renderCard(await trello.getTicket(trelloCardId[1]))
@@ -99,6 +100,7 @@ module.exports.help = {
   name: 'ticket',
   help: {
     desc: 'Shows information about a given ticket.',
-    usage: '?ticket [ticket]'
-  }
+    usage: 'ticket [ticket]'
+  },
+  aliases: ['t']
 }
