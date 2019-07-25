@@ -20,7 +20,11 @@ module.exports.run = async (client, message, args) => {
   let board = args[0]
   let input = args.slice(1).join(' ')
   if (!boards.includes(board.toLowerCase())) {
-    return message.channel.send('Not a valid board.')
+    return message.channel.send(
+      `Not a valid board, choose from one of these:\n\`\`\`${boards.join(
+        ' '
+      )}\`\`\``
+    )
   }
   if (!input) {
     return message.channel.send('Please provide a query.')
@@ -174,5 +178,9 @@ module.exports.run = async (client, message, args) => {
 }
 
 module.exports.help = {
-  name: 'search'
+  name: 'search',
+  help: {
+    desc: 'Searches for a ticket on any of the trello boards.',
+    usage: '?search [board] [query]'
+  }
 }

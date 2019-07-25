@@ -96,5 +96,9 @@ module.exports.run = async (client, message, args) => {
 }
 
 module.exports.help = {
-  name: 'ticket'
+  name: 'ticket',
+  help: {
+    desc: 'Shows information about a given ticket.',
+    usage: '?ticket [ticket]'
+  }
 }

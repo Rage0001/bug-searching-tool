@@ -130,6 +130,8 @@ module.exports.filterComments = async comments => {
   let adminComments = []
   comments.forEach(comment => {
     if (comment.memberCreator.id === '58c07cf2115d7e5848862195') {
+      if (comment.data.text.includes('Can reproduce.')) return
+      if (comment.data.text.includes("Can't reproduce.")) return
       userComments.push(comment.data.text)
     } else {
       adminComments.push(
