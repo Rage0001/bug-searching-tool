@@ -1,6 +1,5 @@
 const config = require('../config.json')
 const trello = require('../modules/trello.js')
-const request = require('request')
 const Discord = require('discord.js')
 const boards = ['desktop', 'ios', 'linux', 'android', 'store', 'web', 'overlay']
 
@@ -21,7 +20,11 @@ module.exports.run = async (client, message, args) => {
   let board = args[0]
   let input = args.slice(1).join(' ')
   if (!boards.includes(board.toLowerCase())) {
-    return message.channel.send('Not a valid board.')
+    return message.channel.send(
+      `Not a valid board, choose from one of these:\n\`\`\`${boards.join(
+        ' '
+      )}\`\`\``
+    )
   }
   if (!input) {
     return message.channel.send('Please provide a query.')
@@ -105,7 +108,6 @@ module.exports.run = async (client, message, args) => {
           backwardReaction.remove(client.user)
           forwardReaction.remove(client.user)
         })
-        client.queries++
       } else {
         botMsg.edit(resultsEmbed)
       }
@@ -170,12 +172,15 @@ module.exports.run = async (client, message, args) => {
         message.author.avatarURL
       )
       message.channel.send(resultsEmbed)
-      client.queries++
     }
   }
   renderSearch(await trello.trelloSearch(input, boardID, 0))
 }
 
 module.exports.help = {
-  name: 'search'
+  name: 'search',
+  help: {
+    desc: 'Searches for a ticket on any of the trello boards.',
+    usage: '?search [board] [query]'
+  }
 }

@@ -1,4 +1,3 @@
-const config = require('../config.json')
 const trello = require('../modules/trello.js')
 const Discord = require('discord.js')
 module.exports.run = async (client, message, args) => {
@@ -31,7 +30,6 @@ module.exports.run = async (client, message, args) => {
       return message.channel.send('No results returned.')
     }
 
-    // let listName = await trello.getListName(card.id)
     let listName = card.list.name
     let formattedDesc = await trello.formatDescription(card.desc)
     var labels = []
@@ -92,12 +90,15 @@ module.exports.run = async (client, message, args) => {
       message.author.avatarURL
     )
     message.channel.send(resultsEmbed)
-    client.queries++
   }
 
   renderCard(await trello.getTicket(trelloCardId[1]))
 }
 
 module.exports.help = {
-  name: 'ticket'
+  name: 'ticket',
+  help: {
+    desc: 'Shows information about a given ticket.',
+    usage: '?ticket [ticket]'
+  }
 }

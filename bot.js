@@ -9,8 +9,8 @@ const config = editor('./config.json', {
 })
 
 client.commands = new Discord.Collection()
+client.aliases = new Discord.Collection()
 client.config = config
-client.queries = 0
 
 fs.readdir('./commands/', (err, files) => {
   if (err) return console.error(err)
@@ -19,6 +19,9 @@ fs.readdir('./commands/', (err, files) => {
     let props = require(`./commands/${file}`)
     let commandName = file.split('.')[0]
     console.log(`* ${commandName}`)
+    if (props.alias) {
+      client.aliases.set(props.alias, props)
+    }
     client.commands.set(commandName, props)
   })
 })

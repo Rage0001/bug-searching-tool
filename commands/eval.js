@@ -14,5 +14,9 @@ module.exports.run = async (client, message, args) => {
 }
 
 module.exports.help = {
-  name: 'eval'
+  name: 'eval',
+  help: {
+    desc: 'Evaluates JavaScript code.',
+    usage: '?eval [code]'
+  }
 }
