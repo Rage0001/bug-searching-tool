@@ -60,6 +60,7 @@ module.exports.help = {
   name: 'comments',
   help: {
     desc: 'View comments from users and admin on given card.',
-    usage: '?comments [ticket]'
-  }
+    usage: 'comments [ticket]'
+  },
+  aliases: ['comment', 'com', 'c']
 }

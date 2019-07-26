@@ -181,6 +181,7 @@ module.exports.help = {
   name: 'search',
   help: {
     desc: 'Searches for a ticket on any of the trello boards.',
-    usage: '?search [board] [query]'
-  }
+    usage: 'search [board] [query]'
+  },
+  aliases: ['s']
 }

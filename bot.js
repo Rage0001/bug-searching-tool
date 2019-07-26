@@ -19,10 +19,12 @@ fs.readdir('./commands/', (err, files) => {
     let props = require(`./commands/${file}`)
     let commandName = file.split('.')[0]
     console.log(`* ${commandName}`)
-    if (props.alias) {
-      client.aliases.set(props.alias, props)
-    }
     client.commands.set(commandName, props)
+    if (props.help.aliases) {
+      props.help.aliases.forEach(alias => {
+        client.aliases.set(alias, props.help.name)
+      })
+    }
   })
 })
 

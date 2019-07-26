@@ -17,6 +17,6 @@ module.exports.help = {
   name: 'eval',
   help: {
     desc: 'Evaluates JavaScript code.',
-    usage: '?eval [code]'
+    usage: 'eval [code]'
   }
 }
