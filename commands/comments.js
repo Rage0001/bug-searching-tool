@@ -40,7 +40,9 @@ module.exports.run = async (client, message, args) => {
   if (admincomments.length > 1024) {
     admincomments = admincomments.substring(0, 1021) + '...'
   }
-  commentsEmbed.addField('User Comments', usercomments)
+  if (usercomments !== '') {
+    commentsEmbed.addField('User Comments', usercomments)
+  }
   if (admincomments !== '') {
     commentsEmbed.addField('Admin Comments', admincomments)
   }
@@ -55,5 +57,10 @@ module.exports.run = async (client, message, args) => {
 }
 
 module.exports.help = {
-  name: 'comments'
+  name: 'comments',
+  help: {
+    desc: 'View comments from users and admin on given card.',
+    usage: 'comments [ticket]'
+  },
+  aliases: ['comment', 'com', 'c']
 }

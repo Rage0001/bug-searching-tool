@@ -13,7 +13,7 @@ module.exports.trelloSearch = async (input, boardID, page) => {
       modelTypes: 'cards',
       boards_limit: '1',
       card_fields: 'desc,name,shortUrl,labels,closed',
-      cards_limit: '6',
+      cards_limit: '5',
       cards_page: String(page),
       card_list: 'false',
       card_members: 'false',
@@ -102,7 +102,7 @@ module.exports.getComments = async cardID => {
     }
   }
 
-  const result = JSON.parse((await requestPromise(options)).body)
+  var result = JSON.parse((await requestPromise(options)).body)
 
   if (!boardIDs.includes(result[0].data.board.id)) {
     result = null
@@ -122,10 +122,7 @@ module.exports.getReproRatio = async comments => {
       cnrs = cnrs + 1
     }
   })
-  return {
-    crs,
-    cnrs
-  }
+  return { crs, cnrs }
 }
 
 module.exports.filterComments = async comments => {
@@ -133,6 +130,8 @@ module.exports.filterComments = async comments => {
   let adminComments = []
   comments.forEach(comment => {
     if (comment.memberCreator.id === '58c07cf2115d7e5848862195') {
+      if (comment.data.text.includes('Can reproduce.')) return
+      if (comment.data.text.includes("Can't reproduce.")) return
       userComments.push(comment.data.text)
     } else {
       adminComments.push(
@@ -140,10 +139,7 @@ module.exports.filterComments = async comments => {
       )
     }
   })
-  return {
-    userComments,
-    adminComments
-  }
+  return { userComments, adminComments }
 }
 
 module.exports.formatDescription = async desc => {

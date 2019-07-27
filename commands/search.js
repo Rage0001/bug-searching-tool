@@ -20,7 +20,11 @@ module.exports.run = async (client, message, args) => {
   let board = args[0]
   let input = args.slice(1).join(' ')
   if (!boards.includes(board.toLowerCase())) {
-    return message.channel.send('Not a valid board.')
+    return message.channel.send(
+      `Not a valid board, choose from one of these:\n\`\`\`${boards.join(
+        ' '
+      )}\`\`\``
+    )
   }
   if (!input) {
     return message.channel.send('Please provide a query.')
@@ -33,15 +37,10 @@ module.exports.run = async (client, message, args) => {
 
   let botMsg = null
 
-  let hasForwardReaction = false
-
   const renderSearch = async cards => {
     if (cards.length > 1 || currentPage !== 0) {
       var cardsDone = []
-      cards.forEach((card, idx) => {
-        if (idx >= 5) {
-          return
-        }
+      cards.forEach(card => {
         cardsDone.push(`**${card.name}**\nLink: ${card.shortUrl}`)
       })
       let forwardEmoji = '▶'
@@ -55,11 +54,8 @@ module.exports.run = async (client, message, args) => {
       )
       if (botMsg == null) {
         botMsg = await message.channel.send(resultsEmbed)
-        if (cards.length > 5) {
-          await botMsg.react(backwardEmoji)
-          botMsg.react(forwardEmoji)
-          hasForwardReaction = true
-        }
+        var backwardReaction = await botMsg.react(backwardEmoji)
+        var forwardReaction = await botMsg.react(forwardEmoji)
         const filter = (reaction, user) => user.id === message.author.id
         const collector = botMsg.createReactionCollector(filter)
         let stopTimer
@@ -109,25 +105,11 @@ module.exports.run = async (client, message, args) => {
           }
         })
         collector.on('end', c => {
-          try {
-            botMsg.reactions.get(backwardEmoji).remove(client.user)
-          } catch (e) {}
-          try {
-            botMsg.reactions.get(forwardEmoji).remove(client.user)
-          } catch (e) {}
+          backwardReaction.remove(client.user)
+          forwardReaction.remove(client.user)
         })
       } else {
         botMsg.edit(resultsEmbed)
-      }
-      if (!hasForwardReaction && cards.length > 5) {
-        botMsg.react(forwardEmoji)
-        hasForwardReaction = true
-      }
-      if (hasForwardReaction && cards.length <= 5) {
-        try {
-          botMsg.reactions.get(forwardEmoji).remove(client.user)
-        } catch (e) {}
-        hasForwardReaction = false
       }
     } else {
       if (cards.length === 0) {
@@ -196,5 +178,10 @@ module.exports.run = async (client, message, args) => {
 }
 
 module.exports.help = {
-  name: 'search'
+  name: 'search',
+  help: {
+    desc: 'Searches for a ticket on any of the trello boards.',
+    usage: 'search [board] [query]'
+  },
+  aliases: ['s']
 }
