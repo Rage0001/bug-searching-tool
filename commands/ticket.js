@@ -16,9 +16,7 @@ module.exports.run = async (client, message, args) => {
   ]
 
   let trelloURL = args[0]
-  let trelloCardId = trelloURL.match(
-    /(?:(?:<)?(?:https?:\/\/)?(?:www\.)?trello.com\/c\/)?([^\/|\s|\>]+)(?:\/|\>)?(?:[\w-\d]*)?(?:\/|\>|\/>)?\s*\|?\s*([\s\S]*)/i
-  )
+  let trelloCardId = trello.urlRegex(trelloURL)
   if (!trelloCardId || !trelloCardId[1]) {
     return message.channel.send('Not a Trello URL.')
   }
@@ -62,28 +60,16 @@ module.exports.run = async (client, message, args) => {
     } else {
       resultsEmbed.setTitle(card.name)
     }
-    if (youtubeURL) {
-      resultsEmbed.setDescription(
-        `Board: ${card.board.name}\n` +
-          `Labels: ${finalLabels}\n` +
-          `List: ${listName}\nArchived: ${
-            card.closed === true ? 'Yes' : 'No'
-          }` +
-          `\n\n` +
-          `${formattedDesc}\n\nLink: ${card.shortUrl}\nVideo: ${card.attachments[0].url}`
-      )
-    } else {
-      resultsEmbed.setDescription(
-        `Board: ${card.board.name}\n` +
-          `Labels: ${finalLabels}\n` +
-          `List: ${listName}\nArchived: ${
-            card.closed === true ? 'Yes' : 'No'
-          }` +
-          `\n\n` +
-          `${formattedDesc}\n\nLink: ${card.shortUrl}`
-      )
-    }
-    resultsEmbed.setColor('#ff3535')
+    resultsEmbed.setDescription(
+      `Board: ${card.board.name}\n` +
+        `Labels: ${finalLabels}\n` +
+        `List: ${listName}\n` +
+        `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
+        `\n\n` +
+        `${formattedDesc}\n\nLink: ${card.shortUrl}` +
+        (youtubeURL ? `\nVideo: ${card.attachments[0].url}` : '')
+    )
+    resultsEmbed.setColor('#1b9100')
     resultsEmbed.setFooter(
       `Executed by ${message.author.tag}`,
       message.author.avatarURL

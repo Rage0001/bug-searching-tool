@@ -7,5 +7,5 @@
   "editor.trimAutoWhitespace": true,
   "files.trimTrailingWhitespace": true,
 
-  "javascript.preferences.quoteStyle": "single",
+  "javascript.preferences.quoteStyle": "single"
 }

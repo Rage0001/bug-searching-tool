@@ -21,9 +21,8 @@ module.exports.run = async (client, message, args) => {
   let input = args.slice(1).join(' ')
   if (!boards.includes(board.toLowerCase())) {
     return message.channel.send(
-      `Not a valid board, choose from one of these:\n\`\`\`${boards.join(
-        ' '
-      )}\`\`\``
+      `Not a valid board, choose from one of these:\n` +
+        `\`\`\`${boards.join(' ')}\`\`\``
     )
   }
   if (!input) {
@@ -115,17 +114,17 @@ module.exports.run = async (client, message, args) => {
       if (cards.length === 0) {
         return message.channel.send('No results returned.')
       }
-
-      let listName = await trello.getListName(cards[0].id)
-      let formattedDesc = await trello.formatDescription(cards[0].desc)
+      let card = cards[0]
+      let listName = await trello.getListName(card.id)
+      let formattedDesc = await trello.formatDescription(card.desc)
       var labels = []
-      if (cards[0].labels.length !== 0) {
-        if (cards[0].labels.length === 1) {
+      if (card.labels.length !== 0) {
+        if (card.labels.length === 1) {
           labels.push(
-            emotesSeverity[labelSeverity.indexOf(cards[0].labels[0].color)]
+            emotesSeverity[labelSeverity.indexOf(card.labels[0].color)]
           )
         } else {
-          cards[0].labels.forEach(label => {
+          card.labels.forEach(label => {
             if (labelSeverity.includes(label.color)) {
               labels.push(emotesSeverity[labelSeverity.indexOf(label.color)])
             }
@@ -138,35 +137,28 @@ module.exports.run = async (client, message, args) => {
       let finalLabels = labels.join(' ')
       if (finalLabels === '') finalLabels = 'None'
       message.channel.send("Here you go, here's what I found:")
-      if (cards[0].attachments.length !== 0) {
-        var youtubeURL = cards[0].attachments[0].url.match(
+      if (card.attachments.length !== 0) {
+        var youtubeURL = card.attachments[0].url.match(
           '^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$'
         )
         if (!youtubeURL) {
-          resultsEmbed.setImage(cards[0].attachments[0].url)
+          resultsEmbed.setImage(card.attachments[0].url)
         }
       }
-      if (cards[0].name.length > 250) {
-        resultsEmbed.setTitle(cards[0].name.substring(0, 247) + '...')
+      if (card.name.length > 250) {
+        resultsEmbed.setTitle(card.name.substring(0, 247) + '...')
       } else {
-        resultsEmbed.setTitle(cards[0].name)
+        resultsEmbed.setTitle(card.name)
       }
-      if (youtubeURL) {
-        resultsEmbed.setDescription(
-          `Labels: ${finalLabels}\nList: ${listName}\nArchived: ${
-            cards[0].closed === true ? 'Yes' : 'No'
-          }\n\n${formattedDesc}\n\nLink: ${cards[0].shortUrl}\nVideo: ${
-            cards[0].attachments[0].url
-          }`
-        )
-      } else {
-        resultsEmbed.setDescription(
-          `Labels: ${finalLabels}\nList: ${listName}\nArchived: ${
-            cards[0].closed === true ? 'Yes' : 'No'
-          }\n\n${formattedDesc}\n\nLink: ${cards[0].shortUrl}`
-        )
-      }
-      resultsEmbed.setColor('#ff3535')
+      resultsEmbed.setDescription(
+        `List: ${listName}\n` +
+          `Labels: ${finalLabels}\n` +
+          `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
+          `\n\n` +
+          `${formattedDesc}\n\nLink: ${card.shortUrl}` +
+          (youtubeURL ? `\nVideo: ${card.attachments[0].url}` : '')
+      )
+      resultsEmbed.setColor('#1b9100')
       resultsEmbed.setFooter(
         `Executed by ${message.author.tag}`,
         message.author.avatarURL
