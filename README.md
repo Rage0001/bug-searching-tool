@@ -21,7 +21,7 @@ A bot useful for Bug Hunters to search bugs from the Trello boards.
 
 ### Hosting yourself
 
-Dependancies:
+Dependencies:
 - [NodeJS](https://nodejs.org/en/): 10+
 - [Git](https://git-scm.com/downloads): 2.9+
 
