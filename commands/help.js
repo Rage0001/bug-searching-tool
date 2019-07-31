@@ -1,6 +1,12 @@
 const Discord = require('discord.js')
 
 module.exports.run = async (client, message, args) => {
+  if (!message.guild.me.hasPermission('EMBED_LINKS')) {
+    return message.channel.send(
+      'ERROR: I require the `EMBED_LINKS` Permission to run this command.'
+    )
+  }
+
   var prefix = client.config.get('prefix')
   if (args[0]) {
     let command = client.commands.get(args[0]) || client.aliases.get(args[0])
