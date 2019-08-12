@@ -135,7 +135,7 @@ module.exports.filterComments = async comments => {
       userComments.push(comment.data.text)
     } else {
       adminComments.push(
-        `${comment.data.text} - ${comment.memberCreator.fullName}`
+        `${comment.data.text}\n\n${comment.memberCreator.fullName}`
       )
     }
   })
@@ -150,4 +150,10 @@ module.exports.formatDescription = async desc => {
     .replace(/####Client settings:/g, '➤ __**Client settings:**__')
     .replace(/####System settings:/g, '➤ __**System settings:**__')
   return formatted
+}
+
+module.exports.urlRegex = trelloURL => {
+  return trelloURL.match(
+    /(?:(?:<)?(?:https?:\/\/)?(?:www\.)?trello.com\/c\/)?([^\/|\s|\>]+)(?:\/|\>)?(?:[\w-\d]*)?(?:\/|\>|\/>)?\s*\|?\s*([\s\S]*)/i
+  )
 }

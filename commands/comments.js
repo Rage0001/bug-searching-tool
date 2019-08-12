@@ -1,10 +1,14 @@
 const trello = require('../modules/trello.js')
 const Discord = require('discord.js')
 module.exports.run = async (client, message, args) => {
+  if (!message.guild.me.hasPermission('EMBED_LINKS')) {
+    return message.channel.send(
+      'ERROR: I require the `EMBED_LINKS` Permission to run this command.'
+    )
+  }
+
   let trelloURL = args[0]
-  let trelloCardId = trelloURL.match(
-    /(?:(?:<)?(?:https?:\/\/)?(?:www\.)?trello.com\/c\/)?([^\/|\s|\>]+)(?:\/|\>)?(?:[\w-\d]*)?(?:\/|\>|\/>)?\s*\|?\s*([\s\S]*)/i
-  )
+  let trelloCardId = trello.urlRegex(trelloURL)
   if (!trelloCardId || !trelloCardId[1]) {
     return message.channel.send('Not a Trello URL.')
   }

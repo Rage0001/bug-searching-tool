@@ -4,15 +4,21 @@ const Discord = require('discord.js')
 const boards = ['desktop', 'ios', 'linux', 'android', 'store', 'web', 'overlay']
 
 module.exports.run = async (client, message, args) => {
+  if (!message.guild.me.hasPermission('EMBED_LINKS')) {
+    return message.channel.send(
+      'ERROR: I require the `EMBED_LINKS` Permission to run this command.'
+    )
+  }
+
   const labelSeverity = ['red', 'orange', 'yellow', 'green']
-  const emotesSeverity = [
+  const emojiSeverity = [
     client.parseEmoji('p0'),
     client.parseEmoji('p1'),
     client.parseEmoji('p2'),
     client.parseEmoji('p3')
   ]
   const labelPriority = ['sky', 'lime', 'pink']
-  const emotesPriority = [
+  const emojiPriority = [
     client.parseEmoji('low'),
     client.parseEmoji('mid'),
     client.parseEmoji('high')
@@ -21,9 +27,8 @@ module.exports.run = async (client, message, args) => {
   let input = args.slice(1).join(' ')
   if (!boards.includes(board.toLowerCase())) {
     return message.channel.send(
-      `Not a valid board, choose from one of these:\n\`\`\`${boards.join(
-        ' '
-      )}\`\`\``
+      `Not a valid board, choose from one of these:\n` +
+        `\`\`\`${boards.join(' ')}\`\`\``
     )
   }
   if (!input) {
@@ -31,13 +36,16 @@ module.exports.run = async (client, message, args) => {
   }
   var boardID = config.trello[board.toLowerCase() + '_bugs']
 
-  var resultsEmbed = new Discord.RichEmbed()
+  var searchEmbed = new Discord.RichEmbed()
 
   let currentPage = 0
 
   let botMsg = null
 
   const renderSearch = async cards => {
+    if (cards.length === 0) {
+      return message.channel.send('No results returned.')
+    }
     if (cards.length > 1 || currentPage !== 0) {
       var cardsDone = []
       cards.forEach(card => {
@@ -45,15 +53,15 @@ module.exports.run = async (client, message, args) => {
       })
       let forwardEmoji = '▶'
       let backwardEmoji = '◀'
-      resultsEmbed.setTitle(`Results (page ${currentPage + 1}):`)
-      resultsEmbed.setDescription(cardsDone.join('\n\n'))
-      resultsEmbed.setColor('#ff3535')
-      resultsEmbed.setFooter(
+      searchEmbed.setTitle(`Results (page ${currentPage + 1}):`)
+      searchEmbed.setDescription(cardsDone.join('\n\n'))
+      searchEmbed.setColor('#ff3535')
+      searchEmbed.setFooter(
         `Executed by ${message.author.tag}`,
         message.author.avatarURL
       )
       if (botMsg == null) {
-        botMsg = await message.channel.send(resultsEmbed)
+        botMsg = await message.channel.send(searchEmbed)
         var backwardReaction = await botMsg.react(backwardEmoji)
         var forwardReaction = await botMsg.react(forwardEmoji)
         const filter = (reaction, user) => user.id === message.author.id
@@ -109,69 +117,65 @@ module.exports.run = async (client, message, args) => {
           forwardReaction.remove(client.user)
         })
       } else {
-        botMsg.edit(resultsEmbed)
+        botMsg.edit(searchEmbed)
       }
     } else {
-      if (cards.length === 0) {
-        return message.channel.send('No results returned.')
-      }
-
-      let listName = await trello.getListName(cards[0].id)
-      let formattedDesc = await trello.formatDescription(cards[0].desc)
+      let card = cards[0]
+      let listName = await trello.getListName(card.id)
+      let formattedDesc = await trello.formatDescription(card.desc)
       var labels = []
-      if (cards[0].labels.length !== 0) {
-        if (cards[0].labels.length === 1) {
-          labels.push(
-            emotesSeverity[labelSeverity.indexOf(cards[0].labels[0].color)]
-          )
-        } else {
-          cards[0].labels.forEach(label => {
-            if (labelSeverity.includes(label.color)) {
-              labels.push(emotesSeverity[labelSeverity.indexOf(label.color)])
-            }
-            if (labelPriority.includes(label.color)) {
-              labels.push(emotesPriority[labelPriority.indexOf(label.color)])
-            }
-          })
+      card.labels.forEach(label => {
+        if (labelSeverity.includes(label.color)) {
+          labels.push(emojiSeverity[labelSeverity.indexOf(label.color)])
         }
-      }
+        if (labelPriority.includes(label.color)) {
+          labels.push(emojiPriority[labelPriority.indexOf(label.color)])
+        }
+      })
       let finalLabels = labels.join(' ')
       if (finalLabels === '') finalLabels = 'None'
-      message.channel.send("Here you go, here's what I found:")
-      if (cards[0].attachments.length !== 0) {
-        var youtubeURL = cards[0].attachments[0].url.match(
+
+      var videos = []
+      var pictures = []
+      var firstImage = true
+      card.attachments.forEach(attachment => {
+        var youtubeURL = attachment.url.match(
           '^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$'
         )
-        if (!youtubeURL) {
-          resultsEmbed.setImage(cards[0].attachments[0].url)
+        if (youtubeURL) {
+          videos.push(`Video ${videos.length + 1}: ${youtubeURL}`)
+        } else {
+          if (firstImage) {
+            firstImage = !firstImage
+            searchEmbed.setImage(attachment.url)
+          } else {
+            pictures.push(`[Image ${pictures.length + 1}](${attachment.url})`)
+          }
         }
-      }
-      if (cards[0].name.length > 250) {
-        resultsEmbed.setTitle(cards[0].name.substring(0, 247) + '...')
+      })
+
+      if (card.name.length > 250) {
+        searchEmbed.setTitle(card.name.substring(0, 247) + '...')
       } else {
-        resultsEmbed.setTitle(cards[0].name)
+        searchEmbed.setTitle(card.name)
       }
-      if (youtubeURL) {
-        resultsEmbed.setDescription(
-          `Labels: ${finalLabels}\nList: ${listName}\nArchived: ${
-            cards[0].closed === true ? 'Yes' : 'No'
-          }\n\n${formattedDesc}\n\nLink: ${cards[0].shortUrl}\nVideo: ${
-            cards[0].attachments[0].url
-          }`
-        )
-      } else {
-        resultsEmbed.setDescription(
-          `Labels: ${finalLabels}\nList: ${listName}\nArchived: ${
-            cards[0].closed === true ? 'Yes' : 'No'
-          }\n\n${formattedDesc}\n\nLink: ${cards[0].shortUrl}`
-        )
-      }
-      resultsEmbed.setColor('#ff3535')
-      resultsEmbed.setFooter(
+      searchEmbed.setDescription(
+        `List: ${listName}\n` +
+          `Labels: ${finalLabels}\n` +
+          `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
+          `\n\n` +
+          `${formattedDesc}\n\nLink: ${card.shortUrl}` +
+          (videos.length > 0 ? `\n${videos.join('\n')}` : '') +
+          (pictures.length > 0 ? `\nOther images: ${pictures.join(', ')}` : '')
+      )
+      searchEmbed.setColor('#1b9100')
+      searchEmbed.setFooter(
         `Executed by ${message.author.tag}`,
         message.author.avatarURL
       )
-      message.channel.send(resultsEmbed)
+      message.channel.send("Here you go, here's what I found:", {
+        embed: searchEmbed
+      })
     }
   }
   renderSearch(await trello.trelloSearch(input, boardID, 0))

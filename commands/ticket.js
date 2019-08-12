@@ -1,29 +1,33 @@
 const trello = require('../modules/trello.js')
 const Discord = require('discord.js')
 module.exports.run = async (client, message, args) => {
+  if (!message.guild.me.hasPermission('EMBED_LINKS')) {
+    return message.channel.send(
+      'ERROR: I require the `EMBED_LINKS` Permission to run this command.'
+    )
+  }
+
   const labelSeverity = ['red', 'orange', 'yellow', 'green']
-  const emotesSeverity = [
+  const emojiSeverity = [
     client.parseEmoji('p0'),
     client.parseEmoji('p1'),
     client.parseEmoji('p2'),
     client.parseEmoji('p3')
   ]
   const labelPriority = ['sky', 'lime', 'pink']
-  const emotesPriority = [
+  const emojiPriority = [
     client.parseEmoji('low'),
     client.parseEmoji('mid'),
     client.parseEmoji('high')
   ]
 
   let trelloURL = args[0]
-  let trelloCardId = trelloURL.match(
-    /(?:(?:<)?(?:https?:\/\/)?(?:www\.)?trello.com\/c\/)?([^\/|\s|\>]+)(?:\/|\>)?(?:[\w-\d]*)?(?:\/|\>|\/>)?\s*\|?\s*([\s\S]*)/i
-  )
+  let trelloCardId = trello.urlRegex(trelloURL)
   if (!trelloCardId || !trelloCardId[1]) {
     return message.channel.send('Not a Trello URL.')
   }
 
-  var resultsEmbed = new Discord.RichEmbed()
+  var ticketEmbed = new Discord.RichEmbed()
 
   const renderCard = async card => {
     if (!card || card.length === 0) {
@@ -33,63 +37,57 @@ module.exports.run = async (client, message, args) => {
     let listName = card.list.name
     let formattedDesc = await trello.formatDescription(card.desc)
     var labels = []
-    if (card.labels.length !== 0) {
-      if (card.labels.length === 1) {
-        labels.push(emotesSeverity[labelSeverity.indexOf(card.labels[0].color)])
-      } else {
-        card.labels.forEach(label => {
-          if (labelSeverity.includes(label.color)) {
-            labels.push(emotesSeverity[labelSeverity.indexOf(label.color)])
-          }
-          if (labelPriority.includes(label.color)) {
-            labels.push(emotesPriority[labelPriority.indexOf(label.color)])
-          }
-        })
+    card.labels.forEach(label => {
+      if (labelSeverity.includes(label.color)) {
+        labels.push(emojiSeverity[labelSeverity.indexOf(label.color)])
       }
-    }
+      if (labelPriority.includes(label.color)) {
+        labels.push(emojiPriority[labelPriority.indexOf(label.color)])
+      }
+    })
     let finalLabels = labels.join(' ')
     if (finalLabels === '') finalLabels = 'None'
-    if (card.attachments.length !== 0) {
-      var youtubeURL = card.attachments[0].url.match(
+
+    var videos = []
+    var pictures = []
+    var firstImage = true
+    card.attachments.forEach(attachment => {
+      var youtubeURL = attachment.url.match(
         '^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$'
       )
-      if (!youtubeURL) {
-        resultsEmbed.setImage(card.attachments[0].url)
+      if (youtubeURL) {
+        videos.push(`Video ${videos.length + 1}: ${attachment.url}`)
+      } else {
+        if (firstImage) {
+          firstImage = !firstImage
+          ticketEmbed.setImage(attachment.url)
+        } else {
+          pictures.push(`[Image ${pictures.length + 1}](${attachment.url})`)
+        }
       }
-    }
+    })
+
     if (card.name.length > 250) {
-      resultsEmbed.setTitle(card.name.substring(0, 247) + '...')
+      ticketEmbed.setTitle(card.name.substring(0, 247) + '...')
     } else {
-      resultsEmbed.setTitle(card.name)
+      ticketEmbed.setTitle(card.name)
     }
-    if (youtubeURL) {
-      resultsEmbed.setDescription(
-        `Board: ${card.board.name}\n` +
-          `Labels: ${finalLabels}\n` +
-          `List: ${listName}\nArchived: ${
-            card.closed === true ? 'Yes' : 'No'
-          }` +
-          `\n\n` +
-          `${formattedDesc}\n\nLink: ${card.shortUrl}\nVideo: ${card.attachments[0].url}`
-      )
-    } else {
-      resultsEmbed.setDescription(
-        `Board: ${card.board.name}\n` +
-          `Labels: ${finalLabels}\n` +
-          `List: ${listName}\nArchived: ${
-            card.closed === true ? 'Yes' : 'No'
-          }` +
-          `\n\n` +
-          `${formattedDesc}\n\nLink: ${card.shortUrl}`
-      )
-    }
-    resultsEmbed.setColor('#ff3535')
-    resultsEmbed.setFooter(
+    ticketEmbed.setDescription(
+      `List: ${listName}\n` +
+        `Labels: ${finalLabels}\n` +
+        `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
+        `\n\n` +
+        `${formattedDesc}\n\nLink: ${card.shortUrl}` +
+        (videos.length > 0 ? `\n${videos.join('\n')}` : '') +
+        (pictures.length > 0 ? `\nOther images: ${pictures.join(', ')}` : '')
+    )
+    ticketEmbed.setColor('#1b9100')
+    ticketEmbed.setFooter(
       `Executed by ${message.author.tag}`,
       message.author.avatarURL
     )
     message.channel.send("Here you go, here's what I found:", {
-      embed: resultsEmbed
+      embed: ticketEmbed
     })
   }
 
