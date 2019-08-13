@@ -10,7 +10,7 @@ module.exports.trelloSearch = async (input, boardID, page) => {
     qs: {
       limit: 5,
       page: page,
-      content: input,
+      query: input,
       board: boardID,
       kind: 'approve',
       sort: 'relevance',
