@@ -6,30 +6,19 @@ const requestPromise = promisify(request)
 module.exports.trelloSearch = async (input, boardID, page) => {
   let options = {
     method: 'GET',
-    url: 'https://api.trello.com/1/search',
+    url: 'https://gnk.gnk.io/dtesters/search',
     qs: {
+      limit: 5,
+      page: page,
       query: input,
-      idBoards: boardID,
-      modelTypes: 'cards',
-      boards_limit: '1',
-      card_fields: 'desc,name,shortUrl,labels,closed',
-      cards_limit: '5',
-      cards_page: String(page),
-      card_list: 'false',
-      card_members: 'false',
-      card_stickers: 'false',
-      card_attachments: 'true',
-      organization_fields: 'name,displayName',
-      organizations_limit: '10',
-      member_fields: 'avatarHash,fullName,initials,username,confirmed',
-      members_limit: '10',
-      partial: 'false',
-      key: process.env.TRELLO_KEY,
-      token: process.env.TRELLO_TOKEN
-    }
+      board: boardID,
+      kind: 'approve',
+      sort: 'relevance',
+      include: 'title,card',
+    },
   }
   const result = JSON.parse((await requestPromise(options)).body)
-  return result.cards
+  return result
 }
 
 module.exports.getListName = async cardID => {
