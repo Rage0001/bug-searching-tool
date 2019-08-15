@@ -164,7 +164,7 @@ module.exports.run = async (client, message, args) => {
       }    
       searchEmbed.setDescription(
         `Board: [${card.board.name}](${card.board.url})\n` +
-	      `List: ${listName}\n` +
+	        `List: ${listName}\n` +
           `Labels: ${finalLabels}\n` +
           `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
           `\n\n` +
