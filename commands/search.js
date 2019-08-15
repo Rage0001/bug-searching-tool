@@ -49,11 +49,11 @@ module.exports.run = async (client, message, args) => {
     if (cards.hits.length > 1 || currentPage !== 0) {
       var cardsDone = []
       cards.hits.forEach(card => {
-        cardsDone.push(`**${card.event.title}**\nLink: https://trello.com/c/${card.event.card}`)
+        cardsDone.push(`**${card.event.title}**\nLink: https://trello.com/c/${card.event.link}`)
       })
       let forwardEmoji = '▶'
       let backwardEmoji = '◀'
-      searchEmbed.setTitle(`Results (page ${currentPage + 1} of${cards.total.relation === 'gte' ? ' over' : ' '} ${Math.ceil(cards.total.value / 5)}):`)
+      searchEmbed.setTitle(`Results (page ${currentPage + 1} of${cards.total.relation === 'gte' ? ' over ' : ' '}${Math.ceil(cards.total.value / 5)}):`)
       searchEmbed.setDescription(cardsDone.join('\n\n'))
       searchEmbed.setColor('#ff3535')
       searchEmbed.setFooter(
