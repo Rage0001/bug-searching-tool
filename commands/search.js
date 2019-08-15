@@ -124,7 +124,7 @@ module.exports.run = async (client, message, args) => {
       }
     } else {
       const card = await trello.getTicket(cards.hits[0].event.card)
-      let listName = await trello.getListName(card.card)
+      let listName = await trello.getListName(card.id)
       let formattedDesc = await trello.formatDescription(card.desc)
       var labels = []
       card.labels.forEach(label => {
