@@ -14,8 +14,8 @@ module.exports.trelloSearch = async (input, boardID, page) => {
       board: boardID,
       kind: 'approve',
       sort: 'relevance',
-      include: 'title,card,link',
-    },
+      include: 'title,card,link'
+    }
   }
   const result = JSON.parse((await requestPromise(options)).body)
   return result
@@ -145,4 +145,110 @@ module.exports.urlRegex = trelloURL => {
   return trelloURL.match(
     /(?:(?:<)?(?:https?:\/\/)?(?:www\.)?trello.com\/c\/)?([^\/|\s|\>]+)(?:\/|\>)?(?:[\w-\d]*)?(?:\/|\>|\/>)?\s*\|?\s*([\s\S]*)/i
   )
+}
+
+module.exports.getTotalRepros = async type => {
+  let options = {
+    method: 'GET',
+    url: 'https://gnk.gnk.io/dtesters/total',
+    qs: {
+      kind: type
+    }
+  }
+  const result = JSON.parse((await requestPromise(options)).body)
+  return result
+}
+
+module.exports.getUserRepros = async (userTag, type) => {
+  let options = {
+    method: 'GET',
+    url: 'https://gnk.gnk.io/dtesters/total',
+    qs: {
+      kind: type,
+      user: userTag
+    }
+  }
+  const result = JSON.parse((await requestPromise(options)).body)
+  return result
+}
+
+module.exports.getUserBoardRepros = async (userTag, type) => {
+  let boardIDs = [
+    '5771673855f47b547f2decc3',
+    '57f2d333b99965a6ba8cd7e0',
+    '5bc7b4adf7d2b839fa6ac108',
+    '57f2a306ca14741151990900',
+    '5846f7fdfa2f44d1f47267b0',
+    '5cbfb347e17452475d790070',
+    '5cc22e6be84de608c791fdb6'
+  ]
+
+  let boardNames = [
+    'Desktop',
+    'iOS',
+    'Store',
+    'Android',
+    'Linux',
+    'Overlay',
+    'Web'
+  ]
+
+  let collected = []
+
+  for (let i = 0; i < boardIDs.length; i++) {
+    let options = {
+      method: 'GET',
+      url: 'https://gnk.gnk.io/dtesters/total',
+      qs: {
+        kind: type,
+        user: userTag,
+        board: boardIDs[i]
+      }
+    }
+    const result = JSON.parse((await requestPromise(options)).body)
+    result.board = boardNames[boardIDs.indexOf(boardIDs[i])]
+    collected.push(result)
+  }
+
+  return collected
+}
+
+module.exports.getBoardRepros = async type => {
+  let boardIDs = [
+    '5771673855f47b547f2decc3',
+    '57f2d333b99965a6ba8cd7e0',
+    '5bc7b4adf7d2b839fa6ac108',
+    '57f2a306ca14741151990900',
+    '5846f7fdfa2f44d1f47267b0',
+    '5cbfb347e17452475d790070',
+    '5cc22e6be84de608c791fdb6'
+  ]
+
+  let boardNames = [
+    'Desktop',
+    'iOS',
+    'Store',
+    'Android',
+    'Linux',
+    'Overlay',
+    'Web'
+  ]
+
+  let collected = []
+
+  for (let i = 0; i < boardIDs.length; i++) {
+    let options = {
+      method: 'GET',
+      url: 'https://gnk.gnk.io/dtesters/total',
+      qs: {
+        kind: type,
+        board: boardIDs[i]
+      }
+    }
+    const result = JSON.parse((await requestPromise(options)).body)
+    result.board = boardNames[boardIDs.indexOf(boardIDs[i])]
+    collected.push(result)
+  }
+
+  return collected
 }

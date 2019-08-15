@@ -11,6 +11,7 @@ const config = editor('./config.json', {
 client.commands = new Discord.Collection()
 client.aliases = new Discord.Collection()
 client.config = config
+client.emojiChars = require('./modules/emojiChars.js')
 
 fs.readdir('./commands/', (err, files) => {
   if (err) return console.error(err)
@@ -41,4 +42,8 @@ client.login(process.env.BOT_TOKEN)
 
 process.on('unhandledRejection', err => {
   console.error(`Uncaught Promise Rejection: \n${err.stack}`)
+})
+
+process.on('uncaughtException', err => {
+  console.error(`Uncaught Exception: \n${err.stack}`)
 })
