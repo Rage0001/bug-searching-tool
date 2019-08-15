@@ -73,7 +73,8 @@ module.exports.run = async (client, message, args) => {
       ticketEmbed.setTitle(card.name)
     }
     ticketEmbed.setDescription(
-      `List: ${listName}\n` +
+      `Board: [${card.board.name}](${card.board.url})\n` +
+		`List: ${card.list.name}\n` +
         `Labels: ${finalLabels}\n` +
         `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
         `\n\n` +

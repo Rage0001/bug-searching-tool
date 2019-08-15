@@ -161,9 +161,10 @@ module.exports.run = async (client, message, args) => {
         searchEmbed.setTitle(card.name.substring(0, 247) + '...')
       } else {
         searchEmbed.setTitle(card.name)
-      }
+      }    
       searchEmbed.setDescription(
-        `List: ${listName}\n` +
+        `Board: [${card.board.name}](${card.board.url})\n` +
+		  `List: ${listName}\n` +
           `Labels: ${finalLabels}\n` +
           `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
           `\n\n` +
