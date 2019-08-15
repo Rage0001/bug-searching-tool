@@ -4,7 +4,7 @@ const trello = require('../modules/trello.js')
 module.exports.run = async (client, message, args) => {
   if (!args[0])
     return message.channel.send(`Please provide a user to show statistics for.`)
-  var user = await client.users.get(args[0])
+  var user = await client.fetchUser(args[0])
   if (!user) return message.channel.send(`Invalid user.`)
 
   var embed = new Discord.RichEmbed()
