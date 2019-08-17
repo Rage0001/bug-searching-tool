@@ -49,7 +49,18 @@ module.exports.run = async (client, message, args) => {
     if (cards.hits.length > 1 || currentPage !== 0) {
       var cardsDone = []
       cards.hits.forEach(card => {
-        cardsDone.push(`**${card.event.title}**\nLink: https://trello.com/c/${card.event.link}`)
+        let text = `**${card.event.title}**`
+        const highlight = card.highlights[0]
+        if (highlight !== undefined && highlight.key !== 'title') {
+          text += '\n'
+          highlight.positions.forEach(({ start, end }, idx) => {
+            const prevEnd = (highlight.positions[idx - 1] || { end: 0 }).end
+            text += `${highlight.text.slice(prevEnd, start)}**${highlight.text.slice(start, end)}**`
+          })
+          text += highlight.text.slice(highlight.positions[highlight.positions.length - 1].end)
+        }
+        text += `\n_https://trello.com/c/${card.event.link}_`
+        cardsDone.push(text)
       })
       let forwardEmoji = '▶'
       let backwardEmoji = '◀'
@@ -161,7 +172,7 @@ module.exports.run = async (client, message, args) => {
         searchEmbed.setTitle(card.name.substring(0, 247) + '...')
       } else {
         searchEmbed.setTitle(card.name)
-      }    
+      }
       searchEmbed.setDescription(
         `Board: [${card.board.name}](${card.board.url})\n` +
 	        `List: ${listName}\n` +
