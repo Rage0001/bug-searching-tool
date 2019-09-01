@@ -14,7 +14,8 @@ module.exports.trelloSearch = async (input, boardID, page) => {
       board: boardID,
       kind: 'approve',
       sort: 'relevance',
-      include: 'title,card,link'
+      include: 'title,card,link',
+      highlights: 'first'
     }
   }
   const result = JSON.parse((await requestPromise(options)).body)
