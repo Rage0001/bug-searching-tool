@@ -55,16 +55,25 @@ module.exports.run = async (client, message, args) => {
           text += '\n'
           highlight.positions.forEach(({ start, end }, idx) => {
             const prevEnd = (highlight.positions[idx - 1] || { end: 0 }).end
-            text += `${highlight.text.slice(prevEnd, start)}**${highlight.text.slice(start, end)}**`
+            text += `${highlight.text.slice(
+              prevEnd,
+              start
+            )}**${highlight.text.slice(start, end)}**`
           })
-          text += highlight.text.slice(highlight.positions[highlight.positions.length - 1].end)
+          text += highlight.text.slice(
+            highlight.positions[highlight.positions.length - 1].end
+          )
         }
         text += `\n_https://trello.com/c/${card.event.link}_`
         cardsDone.push(text)
       })
       let forwardEmoji = '▶'
       let backwardEmoji = '◀'
-      searchEmbed.setTitle(`Results (page ${currentPage + 1} of${cards.total.relation === 'gte' ? ' over ' : ' '}${Math.ceil(cards.total.value / 5)}):`)
+      searchEmbed.setTitle(
+        `Results (page ${currentPage + 1} of${
+          cards.total.relation === 'gte' ? ' over ' : ' '
+        }${Math.ceil(cards.total.value / 5)}):`
+      )
       searchEmbed.setDescription(cardsDone.join('\n\n'))
       searchEmbed.setColor('#ff3535')
       searchEmbed.setFooter(
@@ -93,7 +102,10 @@ module.exports.run = async (client, message, args) => {
                 r => r._emoji.name === forwardEmoji
               )
               ForwardUserReaction.first().remove(message.author)
-              if (cards.total.relation === 'eq' && currentPage + 1 >= Math.ceil(cards.total.value / 5)) {
+              if (
+                cards.total.relation === 'eq' &&
+                currentPage + 1 >= Math.ceil(cards.total.value / 5)
+              ) {
                 return
               }
               currentPage++
@@ -157,7 +169,7 @@ module.exports.run = async (client, message, args) => {
           '^(https?://)?(www.)?(youtube.com|youtu.?be)/.+$'
         )
         if (youtubeURL) {
-          videos.push(`Video ${videos.length + 1}: ${youtubeURL}`)
+          videos.push(`Video ${videos.length + 1}: ${attachment.url}`)
         } else {
           if (firstImage) {
             firstImage = !firstImage
@@ -175,7 +187,7 @@ module.exports.run = async (client, message, args) => {
       }
       searchEmbed.setDescription(
         `Board: [${card.board.name}](${card.board.url})\n` +
-	        `List: ${listName}\n` +
+          `List: ${listName}\n` +
           `Labels: ${finalLabels}\n` +
           `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
           `\n\n` +
