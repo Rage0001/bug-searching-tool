@@ -43,17 +43,28 @@ module.exports.run = async (client, message, args) => {
   let botMsg = null
 
   const renderSearch = async cards => {
-    if (cards.length === 0) {
+    if (cards.total.value === 0) {
       return message.channel.send('No results returned.')
     }
-    if (cards.length > 1 || currentPage !== 0) {
+    if (cards.hits.length > 1 || currentPage !== 0) {
       var cardsDone = []
-      cards.forEach(card => {
-        cardsDone.push(`**${card.name}**\nLink: ${card.shortUrl}`)
+      cards.hits.forEach(card => {
+        let text = `**${card.event.title}**`
+        const highlight = card.highlights[0]
+        if (highlight !== undefined && highlight.key !== 'title') {
+          text += '\n'
+          highlight.positions.forEach(({ start, end }, idx) => {
+            const prevEnd = (highlight.positions[idx - 1] || { end: 0 }).end
+            text += `${highlight.text.slice(prevEnd, start)}**${highlight.text.slice(start, end)}**`
+          })
+          text += highlight.text.slice(highlight.positions[highlight.positions.length - 1].end)
+        }
+        text += `\n_https://trello.com/c/${card.event.link}_`
+        cardsDone.push(text)
       })
       let forwardEmoji = '▶'
       let backwardEmoji = '◀'
-      searchEmbed.setTitle(`Results (page ${currentPage + 1}):`)
+      searchEmbed.setTitle(`Results (page ${currentPage + 1} of${cards.total.relation === 'gte' ? ' over ' : ' '}${Math.ceil(cards.total.value / 5)}):`)
       searchEmbed.setDescription(cardsDone.join('\n\n'))
       searchEmbed.setColor('#ff3535')
       searchEmbed.setFooter(
@@ -82,13 +93,16 @@ module.exports.run = async (client, message, args) => {
                 r => r._emoji.name === forwardEmoji
               )
               ForwardUserReaction.first().remove(message.author)
+              if (cards.total.relation === 'eq' && currentPage + 1 >= Math.ceil(cards.total.value / 5)) {
+                return
+              }
               currentPage++
               const searchResults = await trello.trelloSearch(
                 input,
                 boardID,
                 currentPage
               )
-              if (searchResults.length === 0) {
+              if (searchResults.hits.length === 0) {
                 currentPage--
                 return
               }
@@ -120,7 +134,7 @@ module.exports.run = async (client, message, args) => {
         botMsg.edit(searchEmbed)
       }
     } else {
-      let card = cards[0]
+      const card = await trello.getTicket(cards.hits[0].event.card)
       let listName = await trello.getListName(card.id)
       let formattedDesc = await trello.formatDescription(card.desc)
       var labels = []
@@ -160,7 +174,8 @@ module.exports.run = async (client, message, args) => {
         searchEmbed.setTitle(card.name)
       }
       searchEmbed.setDescription(
-        `List: ${listName}\n` +
+        `Board: [${card.board.name}](${card.board.url})\n` +
+	        `List: ${listName}\n` +
           `Labels: ${finalLabels}\n` +
           `Archived: ${card.closed === true ? 'Yes' : 'No'}` +
           `\n\n` +
