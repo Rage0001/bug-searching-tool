@@ -10,13 +10,17 @@ module.exports.trelloSearch = async (input, boardID, page) => {
     qs: {
       limit: 5,
       page: page,
-      content: input,
       board: boardID,
       kind: 'approve',
       sort: 'relevance',
       include: 'title,card,link',
       highlights: 'first'
     }
+  }
+  if (input.startsWith('>')) {
+    options.qs.query = input.slice(1).trim()
+  } else {
+    options.qs.content = input
   }
   const result = JSON.parse((await requestPromise(options)).body)
   return result
