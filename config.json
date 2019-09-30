@@ -1,6 +1,7 @@
 {
   "prefix": "-",
   "playing_status": "over the trello boards",
+  "api_base_url": "https://gnk.gnk.io",
   "trello": {
     "desktop_bugs": "5771673855f47b547f2decc3",
     "ios_bugs": "57f2d333b99965a6ba8cd7e0",

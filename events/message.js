@@ -1,7 +1,7 @@
 module.exports = async (client, msg) => {
   if (msg.author.bot) return
 
-  var prefix = client.config.get('prefix')
+  const prefix = client.config.get('prefix')
   if (!msg.content.startsWith(prefix)) return
 
   const args = msg.content
