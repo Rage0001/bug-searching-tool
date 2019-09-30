@@ -1,12 +1,16 @@
 const request = require('request')
 const { promisify } = require('util')
+const config = require('../config')
+const BaseAPIURL = config.api_base_url
 
 const requestPromise = promisify(request)
 
 module.exports.trelloSearch = async (input, boardID, page) => {
+
+
   let options = {
     method: 'GET',
-    url: 'https://gnk.gnk.io/dtesters/search',
+    url: `${BaseAPIURL}/dtesters/search`,
     qs: {
       limit: 5,
       page: page,
@@ -125,7 +129,7 @@ module.exports.filterComments = async comments => {
   comments.forEach(comment => {
     if (comment.memberCreator.id === '58c07cf2115d7e5848862195') {
       if (comment.data.text.includes('Can reproduce.')) return
-      if (comment.data.text.includes("Can't reproduce.")) return
+      if (comment.data.text.includes('Can\'t reproduce.')) return
       userComments.push(comment.data.text)
     } else {
       adminComments.push(
@@ -155,7 +159,7 @@ module.exports.urlRegex = trelloURL => {
 module.exports.getTotalRepros = async type => {
   let options = {
     method: 'GET',
-    url: 'https://gnk.gnk.io/dtesters/total',
+    url: `${BaseAPIURL}/dtesters/total`,
     qs: {
       kind: type
     }
@@ -167,7 +171,7 @@ module.exports.getTotalRepros = async type => {
 module.exports.getUserRepros = async (userTag, type) => {
   let options = {
     method: 'GET',
-    url: 'https://gnk.gnk.io/dtesters/total',
+    url: `${BaseAPIURL}/dtesters/total`,
     qs: {
       kind: type,
       user: userTag
@@ -203,7 +207,7 @@ module.exports.getUserBoardRepros = async (userTag, type) => {
   for (let i = 0; i < boardIDs.length; i++) {
     let options = {
       method: 'GET',
-      url: 'https://gnk.gnk.io/dtesters/total',
+      url: `${BaseAPIURL}/dtesters/total`,
       qs: {
         kind: type,
         user: userTag,
@@ -244,7 +248,7 @@ module.exports.getBoardRepros = async type => {
   for (let i = 0; i < boardIDs.length; i++) {
     let options = {
       method: 'GET',
-      url: 'https://gnk.gnk.io/dtesters/total',
+      url: `${BaseAPIURL}/dtesters/total`,
       qs: {
         kind: type,
         board: boardIDs[i]
