@@ -26,9 +26,7 @@ module.exports.run = async (client, message, args) => {
       )
     if (target.id === sender.id)
       return message.channel.send(
-        `Hey, everyone! Look here, **${
-          sender.username
-        }** just tried hugging themselves! Let's give this poor human some love and hug them!!!`
+        `Hey, everyone! Look here, **${sender.username}** just tried hugging themselves! Let's give this poor human some love and hug them!!!`
       )
 
     let hugRandom = Math.floor(Math.random() * hugMessages.length)

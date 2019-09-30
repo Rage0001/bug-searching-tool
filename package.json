@@ -2,32 +2,42 @@
   "name": "bug-searching-tool",
   "version": "1.0.0",
   "description": "A bot useful for Bug Hunters to search bugs from the Trello boards.",
-  "main": "bot.js",
-  "scripts": {
-    "start": "node bot.js",
-    "test": "echo 'blap'"
+  "keywords": [
+    "bugs"
+  ],
+  "homepage": "https://github.com/Rage0001/bug-searching-tool#readme",
+  "bugs": {
+    "url": "https://github.com/Rage0001/bug-searching-tool/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rage0001/bug-searching-tool.git"
   },
-  "keywords": [
-    "bugs"
-  ],
-  "author": "Rage",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Rage0001/bug-searching-tool/issues"
+  "author": "Rage",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "test": "echo 'blap'"
   },
-  "homepage": "https://github.com/Rage0001/bug-searching-tool#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2
+  },
   "dependencies": {
     "discord.js": "^11.4.2",
-    "dotenv": "^8.0.0",
-    "edit-json-file": "^1.2.1",
+    "dotenv": "^8.1.0",
+    "edit-json-file": "^1.3.1",
     "request": "^2.88.0"
   },
   "devDependencies": {
-    "husky": "^3.0.1",
+    "husky": "^3.0.5",
     "prettier": "^1.18.2",
     "pretty-quick": "^1.11.1"
   }

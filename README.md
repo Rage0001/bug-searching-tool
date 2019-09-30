@@ -22,9 +22,9 @@ A bot useful for Bug Hunters to search bugs from the Trello boards.
 ### Hosting yourself
 
 Dependencies:
+
 - [NodeJS](https://nodejs.org/en/): 10+
 - [Git](https://git-scm.com/downloads): 2.9+
-
 
 1. Clone the repository.
 
@@ -38,10 +38,10 @@ $ git clone https://github.com/Rage0001/bug-searching-tool
 $ npm install
 ```
 
-3. Open the config.json file and fill in the fields for Emojis, Prefix, and Watching Status. *board IDs are already set.*
+3. Open the config.json file and fill in the fields for Emojis, Prefix, and Watching Status. _board IDs are already set._
 4. Rename `.env.example` to `.env` and fill in the fields within it:
-    - Head over to [Discord Dev Applications](https://discordapp.com/developers/applications/) to get BOT_TOKEN
-    - Head over to [Trello app-key](https://trello.com/app-key) to get your TRELLO_KEY and TRELLO_TOKEN.
+   - Head over to [Discord Dev Applications](https://discordapp.com/developers/applications/) to get BOT_TOKEN
+   - Head over to [Trello app-key](https://trello.com/app-key) to get your TRELLO_KEY and TRELLO_TOKEN.
 5. Launch the bot.
 
 ```sh
