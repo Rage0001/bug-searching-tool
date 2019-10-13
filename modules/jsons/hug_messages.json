@@ -3,5 +3,9 @@
   "Aww, **%%sender%%** just hugged %%target%%! My scripted heart is melting **(｡>﹏<｡)**",
   "Hey you, %%target%%! Yes, you are! **%%sender%%** just gave you a hug! :>",
   "Stay where you are, %%target%%! This is a hugging police! And you've just been hugged by **%%sender%%**! **(≧◡≦)**",
-  "**%%sender%%** could not resist the cuteness of %%target%% and gave them a big-big hug! **(っ˘ω˘ς )**"
+  "**%%sender%%** could not resist the cuteness of %%target%% and gave them a big-big hug! **(っ˘ω˘ς )**",
+  "**%%sender%%** gave %%target%% an awkward hug.',
+  '%%sender%% gave %%target%% a tight bear hug!',
+  '%%target%% got tackle-huged by %%sender%%.',
+  '%%sender%% hugs %%target%%, what a good friends they are!.'
 ]
