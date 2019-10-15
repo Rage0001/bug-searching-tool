@@ -38,7 +38,7 @@ $ git clone https://github.com/Rage0001/bug-searching-tool
 $ npm install
 ```
 
-3. Open the config.json file and fill in the fields for Emojis, Prefix, and Watching Status. _board IDs are already set._
+3. Open the `config.example.json` file and fill in the fields for Emojis, Prefix, and Watching Status and save it as `config.json`. _board IDs are already set._
 4. Rename `.env.example` to `.env` and fill in the fields within it:
    - Head over to [Discord Dev Applications](https://discordapp.com/developers/applications/) to get BOT_TOKEN
    - Head over to [Trello app-key](https://trello.com/app-key) to get your TRELLO_KEY and TRELLO_TOKEN.
