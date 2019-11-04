@@ -1,11 +1,15 @@
 const Discord = require('discord.js')
 const trello = require('../modules/trello.js')
 
-module.exports.run = async (client, message, args) => {
-  if (!args[0])
-    return message.channel.send(`Please provide a user to show statistics for.`)
-  var user = await client.fetchUser(args[0])
-  if (!user) return message.channel.send(`Invalid user.`)
+module.exports.run = async (client, message) => {
+  const users = message.content
+    .slice(client.config.get('prefix').length + 'stats'.length)
+    .split(',')
+    .map(u => u.trim())
+  if (!users[0])
+    return message.channel.send(
+      `Please provide at least one user to show statistics for.`
+    )
 
   var embed = new Discord.RichEmbed()
     .setTitle('Please choose one of the categories to view:')
@@ -20,100 +24,95 @@ module.exports.run = async (client, message, args) => {
   const collector = msg.createReactionCollector(filter)
 
   collector.on('collect', async r => {
-    switch (r.emoji.name) {
-      case oneEmoji:
-        embed.setDescription('')
-        embed.setTitle('Please wait, this can take a little.')
-        msg.edit(embed)
-
-        var oneUserReaction = r.message.reactions.filter(
-          r => r._emoji.name === oneEmoji
-        )
-        oneUserReaction.first().remove(message.author)
-        collector.stop()
-
-        let total = await trello.getTotalRepros('cr')
-        let boardTotal = await trello.getBoardRepros('cr')
-        let userTotal = await trello.getUserRepros(user.tag, 'cr')
-        let userBoardTotal = await trello.getUserBoardRepros(user.tag, 'cr')
-        let percentage = (userTotal.total / total.total) * 100
-
-        let description = `**Total Canrepros**\n\`${userTotal.total}/${
-          total.total
-        }\` Canrepros across all boards are yours which is roughly ${percentage
-          .toString()
-          .slice(0, 4)}%\n\n`
-
-        let mapped = userBoardTotal.map(
-          obj =>
-            `**${obj.board}**\n\`${
-              userBoardTotal.filter(b => b.board === obj.board)[0].total
-            }/${
-              boardTotal.filter(b => b.board === obj.board)[0].total
-            }\` Canrepros are yours which is roughly ${(
-              (userBoardTotal.filter(b => b.board === obj.board)[0].total /
-                boardTotal.filter(b => b.board === obj.board)[0].total) *
-              100
-            )
-              .toString()
-              .slice(0, 4)}%`
-        )
-
-        description = description += mapped.join('\n\n')
-
-        embed.setTitle(`Showing CR statistics for user \`${user.tag}\`:`)
-        embed.setThumbnail(user.avatarURL)
-        embed.setDescription(description)
-        msg.edit(embed)
-        break
-      case twoEmoji:
-        embed.setDescription('')
-        embed.setTitle('Please wait, this can take a little.')
-        msg.edit(embed)
-
-        var twoUserReaction = r.message.reactions.filter(
-          r => r._emoji.name === twoEmoji
-        )
-        twoUserReaction.first().remove(message.author)
-        collector.stop()
-
-        let totalTwo = await trello.getTotalRepros('cnr')
-        let boardTotalTwo = await trello.getBoardRepros('cnr')
-        let userTotalTwo = await trello.getUserRepros(user.tag, 'cnr')
-        let userBoardTotalTwo = await trello.getUserBoardRepros(user.tag, 'cnr')
-        let percentageTwo = (userTotalTwo.total / totalTwo.total) * 100
-
-        let descriptionTwo = `**Total Cannotrepros**\n\`${userTotalTwo.total}/${
-          totalTwo.total
-        }\` Cannotrepros across all boards are yours which is roughly ${percentageTwo
-          .toString()
-          .slice(0, 4)}%\n\n`
-
-        let mappedTwo = userBoardTotalTwo.map(
-          obj =>
-            `**${obj.board}**\n\`${
-              userBoardTotalTwo.filter(b => b.board === obj.board)[0].total
-            }/${
-              boardTotalTwo.filter(b => b.board === obj.board)[0].total
-            }\` Cannotrepros are yours which is roughly ${(
-              (userBoardTotalTwo.filter(b => b.board === obj.board)[0].total /
-                boardTotalTwo.filter(b => b.board === obj.board)[0].total) *
-              100
-            )
-              .toString()
-              .slice(0, 4)}%`
-        )
-
-        descriptionTwo = descriptionTwo += mappedTwo.join('\n\n')
-
-        embed.setTitle(`Showing CNR statistics for user \`${user.tag}\`:`)
-        embed.setThumbnail(user.avatarURL)
-        embed.setDescription(descriptionTwo)
-        msg.edit(embed)
-        break
-      default:
-        break
+    let reproType
+    if (r.emoji.name === oneEmoji) {
+      reproType = 'cr'
+    } else if (r.emoji.name === twoEmoji) {
+      reproType = 'cnr'
+    } else {
+      return
     }
+
+    var oneUserReaction = r.message.reactions.filter(
+      r => r._emoji.name === oneEmoji
+    )
+    oneUserReaction.first().remove(message.author)
+    collector.stop()
+
+    const userBoardTotalMap = new Map()
+
+    const totalProm = trello.getTotalRepros(reproType)
+    const boardTotalProm = trello.getBoardRepros(reproType)
+    const userTotalProm = Promise.all(
+      users.map(async user => {
+        return (await trello.getUserRepros(user, reproType)).total
+      })
+    )
+    const userBoardProm = Promise.all(
+      users.map(async user => {
+        const result = await trello.getUserBoardRepros(user, reproType)
+        result.forEach(({ total, board }) => {
+          if (!userBoardTotalMap.get(board)) {
+            userBoardTotalMap.set(board, total)
+          } else {
+            userBoardTotalMap.set(board, userBoardTotalMap.get(board) + total)
+          }
+        })
+      })
+    )
+
+    const [total, boardTotal, userTotals] = await Promise.all([
+      totalProm,
+      boardTotalProm,
+      userTotalProm,
+      userBoardProm
+    ])
+
+    const userTotal = { total: userTotals.reduce((a, b) => a + b) }
+
+    const userBoardTotal = []
+    userBoardTotalMap.forEach((total, board) => {
+      userBoardTotal.push({
+        total,
+        board
+      })
+    })
+    let percentage = (userTotal.total / total.total) * 100
+
+    let description = `**Total**\n\`${userTotal.total}/${
+      total.total
+    }\` ${reproType.toUpperCase()}s across all boards which is roughly ${percentage
+      .toString()
+      .slice(0, 4)}%\n\n`
+
+    let mapped = userBoardTotal.map(
+      obj =>
+        `**${obj.board}**\n\`${
+          userBoardTotal.filter(b => b.board === obj.board)[0].total
+        }/${
+          boardTotal.filter(b => b.board === obj.board)[0].total
+        }\` ${reproType.toUpperCase()}s which is roughly ${(
+          (userBoardTotal.filter(b => b.board === obj.board)[0].total /
+            boardTotal.filter(b => b.board === obj.board)[0].total) *
+          100
+        )
+          .toString()
+          .slice(0, 4)}%`
+    )
+
+    description = description += mapped.join('\n\n')
+
+    embed.setTitle(
+      `Showing ${
+        reproType === 'cr' ? 'canrepro' : 'cannotrepro'
+      } statistics for user ${users.join(', ')}:`
+    )
+    embed.setDescription(description)
+    embed.setFooter(
+      `Executed by ${message.author.tag}`,
+      message.author.avatarURL
+    )
+    msg.edit(embed)
   })
 
   collector.on('end', collected => {
@@ -125,7 +124,8 @@ module.exports.run = async (client, message, args) => {
 module.exports.help = {
   name: 'stats',
   help: {
-    desc: "Shows a user's statistics of their actions on boards.",
-    usage: 'stats [userID]'
+    desc:
+      "Shows a user's statistics of their CRs and CNRs. Users must be specified in DiscordTag#0000 format.",
+    usage: 'stats [user1],[user2],[userN]'
   }
 }

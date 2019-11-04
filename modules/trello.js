@@ -1,13 +1,11 @@
 const request = require('request')
 const { promisify } = require('util')
 const config = require('../config')
-const BaseAPIURL = config.api_base_url
+const BaseAPIURL = config.api_base_url || 'https://gnk.gnk.io'
 
 const requestPromise = promisify(request)
 
 module.exports.trelloSearch = async (input, boardID, page) => {
-
-
   let options = {
     method: 'GET',
     url: `${BaseAPIURL}/dtesters/search`,
@@ -129,7 +127,7 @@ module.exports.filterComments = async comments => {
   comments.forEach(comment => {
     if (comment.memberCreator.id === '58c07cf2115d7e5848862195') {
       if (comment.data.text.includes('Can reproduce.')) return
-      if (comment.data.text.includes('Can\'t reproduce.')) return
+      if (comment.data.text.includes("Can't reproduce.")) return
       userComments.push(comment.data.text)
     } else {
       adminComments.push(
@@ -202,24 +200,22 @@ module.exports.getUserBoardRepros = async (userTag, type) => {
     'Web'
   ]
 
-  let collected = []
-
-  for (let i = 0; i < boardIDs.length; i++) {
-    let options = {
-      method: 'GET',
-      url: `${BaseAPIURL}/dtesters/total`,
-      qs: {
-        kind: type,
-        user: userTag,
-        board: boardIDs[i]
+  return Promise.all(
+    boardIDs.map(async (board, i) => {
+      let options = {
+        method: 'GET',
+        url: `${BaseAPIURL}/dtesters/total`,
+        qs: {
+          kind: type,
+          user: userTag,
+          board: board
+        }
       }
-    }
-    const result = JSON.parse((await requestPromise(options)).body)
-    result.board = boardNames[boardIDs.indexOf(boardIDs[i])]
-    collected.push(result)
-  }
-
-  return collected
+      const result = JSON.parse((await requestPromise(options)).body)
+      result.board = boardNames[i]
+      return result
+    })
+  )
 }
 
 module.exports.getBoardRepros = async type => {
@@ -243,21 +239,33 @@ module.exports.getBoardRepros = async type => {
     'Web'
   ]
 
-  let collected = []
-
-  for (let i = 0; i < boardIDs.length; i++) {
-    let options = {
-      method: 'GET',
-      url: `${BaseAPIURL}/dtesters/total`,
-      qs: {
-        kind: type,
-        board: boardIDs[i]
+  return Promise.all(
+    boardIDs.map(async (boardID, i) => {
+      let options = {
+        method: 'GET',
+        url: `${BaseAPIURL}/dtesters/total`,
+        qs: {
+          kind: type,
+          board: boardID
+        }
       }
-    }
-    const result = JSON.parse((await requestPromise(options)).body)
-    result.board = boardNames[boardIDs.indexOf(boardIDs[i])]
-    collected.push(result)
-  }
+      const result = JSON.parse((await requestPromise(options)).body)
+      result.board = boardNames[i]
+      return result
+    })
+  )
+}
 
-  return collected
+module.exports.getUsers = async ({ prefix }) => {
+  const result = JSON.parse(
+    (await requestPromise({
+      url: `${BaseAPIURL}/dtesters/users`,
+      qs: {
+        prefix,
+        limit: '50',
+        page: '0'
+      }
+    })).body
+  )
+  return result
 }

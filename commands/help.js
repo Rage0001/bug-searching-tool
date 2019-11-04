@@ -9,7 +9,9 @@ module.exports.run = async (client, message, args) => {
 
   var prefix = client.config.get('prefix')
   if (args[0]) {
-    let command = client.commands.get(args[0]) || client.aliases.get(args[0])
+    let command =
+      client.commands.get(args[0]) ||
+      client.commands.get(client.aliases.get(args[0]))
     if (!command) return message.channel.send("I couldn't find that command.")
     let cmdEmbed = new Discord.RichEmbed()
       .setAuthor(command.help.name)
